@@ -1,0 +1,351 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delhi Power Load Predictor</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        .input-panel {
+            text-align: center;
+            padding: 10px;
+        }
+        #sendData {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Delhi Power Load Predictor</h1>
+    <div id="map"></div>
+    <div class="input-panel">
+        <h3>Selected Region</h3>
+        <p id="region">N/A</p>
+        <p>Latitude: <span id="latitude">N/A</span></p>
+        <p>Longitude: <span id="longitude">N/A</span></p>
+        <p>Date: <input type="date" id="date"></p>
+        <button id="sendData">Get Prediction</button>
+    </div>
+    <div class="prediction-output">
+        <p>Predicted Load: <span id="predicted-load">N/A</span> MWh</p>
+        <p>Temperature: <span id="temperature">N/A</span> °C</p>
+        <p>Humidity: <span id="humidity">N/A</span> %</p>
+        <p>Holiday: <span id="holiday">N/A</span></p>
+    </div>
+</div>
+
+<script>
+    // Define Delhi's bounding box (latitude, longitude)
+    var delhiBounds = {
+        minLat: 28.4042,  // South boundary
+        maxLat: 28.8838,  // North boundary
+        minLng: 76.8376,  // West boundary
+        maxLng: 77.3880   // East boundary
+    };
+
+    var lastValidPosition = { lat: 28.629696, lng: 77.230282 }; // Store last valid position
+
+    // Initialize the map centered on Delhi
+    var map = L.map('map').setView([28.629696, 77.230282], 11);
+
+    // Set up the OpenStreetMap tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Add a placeholder marker with drag functionality
+    var marker = L.marker([28.629696, 77.230282], { draggable: true }).addTo(map);
+
+    // Restrict dragging outside Delhi
+    marker.on('dragend', function () {
+        var lat = marker.getLatLng().lat;
+        var lng = marker.getLatLng().lng;
+
+        // Check if the new position is inside Delhi boundaries
+        if (lat >= delhiBounds.minLat && lat <= delhiBounds.maxLat &&
+            lng >= delhiBounds.minLng && lng <= delhiBounds.maxLng) {
+            
+            // Valid location, update UI
+            document.getElementById('latitude').innerText = lat.toFixed(6);
+            document.getElementById('longitude').innerText = lng.toFixed(6);
+
+            // Fetch the region name using reverse geocoding
+            getRegionName(lat, lng);
+
+            // Update last valid position
+            lastValidPosition = { lat: lat, lng: lng };
+        } else {
+            // Out of Delhi boundary, reset to last valid position
+            alert("Please select a location within Delhi.");
+            marker.setLatLng([lastValidPosition.lat, lastValidPosition.lng]);
+        }
+    });
+
+    // Function to fetch the region name based on latitude and longitude
+    function getRegionName(lat, lng) {
+        var url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`;
+
+        $.get(url, function (data) {
+            if (data && data.address) {
+                var region = data.address.suburb || data.address.neighborhood || data.address.city || "Unknown Region";
+                document.getElementById('region').innerText = region;
+            } else {
+                document.getElementById('region').innerText = "Region not found";
+            }
+        });
+    }
+
+    // Function to simulate predicted load with minimal fluctuation
+    function getPredictedLoad() {
+        var baseLoad = 2200;  // Base predicted load
+        var fluctuation = 0.02; // 2% fluctuation
+        return (baseLoad * (1 + (Math.random() * 2 * fluctuation - fluctuation))).toFixed(2);
+    }
+
+    // Function to fetch weather data (temperature, humidity) for the selected region
+    function getWeatherData() {
+        // Static data for simplicity (you can replace with an actual weather API)
+        var temperature = (28 + Math.random() * 2).toFixed(2);  // Random temperature between 28-30°C
+        var humidity = (60 + Math.random() * 10).toFixed(2);  // Random humidity between 60-70%
+        return { temperature: temperature, humidity: humidity };
+    }
+
+    // Function to check if the date is a holiday (simplified)
+    function checkHoliday(date) {
+        if (new Date(date).getDay() === 0) {  // Assume Sunday is a holiday
+            return "Yes";
+        }
+        return "No";
+    }
+
+    // When the user clicks the button, send data to Flask
+    document.getElementById('sendData').addEventListener('click', function() {
+        var latitude = document.getElementById('latitude').innerText;
+        var longitude = document.getElementById('longitude').innerText;
+        var date = document.getElementById('date').value;
+
+        // Validate latitude and longitude
+        if (latitude === 'N/A' || longitude === 'N/A') {
+            alert('Please select a region on the map!');
+            return;
+        }
+
+        // Get predicted load, weather data, and holiday status
+        var predictedLoad = getPredictedLoad();
+        var weatherData = getWeatherData();
+        var holidayStatus = checkHoliday(date);
+
+        // Update the UI with prediction data
+        document.getElementById('predicted-load').innerText = predictedLoad + ' MWh';
+        document.getElementById('temperature').innerText = weatherData.temperature + ' °C';
+        document.getElementById('humidity').innerText = weatherData.humidity + ' %';
+        document.getElementById('holiday').innerText = holidayStatus;
+    });
+</script>
+
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delhi Power Load Predictor</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        .input-panel {
+            text-align: center;
+            padding: 10px;
+        }
+        #sendData {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+        #errorMessage {
+            color: red;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Delhi Power Load Predictor</h1>
+    <div id="map"></div>
+    <div class="input-panel">
+        <h3>Selected Region</h3>
+        <p id="region">N/A</p>
+        <p>Latitude: <span id="latitude">N/A</span></p>
+        <p>Longitude: <span id="longitude">N/A</span></p>
+        <p>Date: <input type="date" id="date"></p>
+        <button id="sendData">Get Prediction</button>
+        <p id="errorMessage">Please select a location within Delhi!</p>
+    </div>
+    <div class="prediction-output">
+        <p>Predicted Load: <span id="predicted-load">N/A</span> MWh</p>
+        <p>Temperature: <span id="temperature">N/A</span> °C</p>
+        <p>Humidity: <span id="humidity">N/A</span> %</p>
+        <p>Holiday: <span id="holiday">N/A</span></p>
+    </div>
+</div>
+
+<script>
+    // Define the boundary for Delhi (GeoJSON polygon for Delhi)
+    var delhiBoundary = [
+        [28.4042, 76.8376],
+        [28.8838, 76.8376],
+        [28.8838, 77.3880],
+        [28.4042, 77.3880],
+        [28.4042, 76.8376]
+    ];
+
+    // Initialize the map centered on Delhi
+    var map = L.map('map').setView([28.629696, 77.230282], 11);
+
+    // Set up the OpenStreetMap tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Add the Delhi boundary polygon
+    var delhiPolygon = L.polygon(delhiBoundary, {
+        color: 'red',
+        weight: 3,
+        fillColor: 'rgba(255, 0, 0, 0.2)',
+        fillOpacity: 0.2
+    }).addTo(map);
+
+    // Add a placeholder marker with drag functionality
+    var marker = L.marker([28.629696, 77.230282], { draggable: true }).addTo(map);
+
+    // Function to check if the marker is within Delhi's boundary
+    function isWithinDelhiBounds(lat, lng) {
+        var inside = false;
+        var x = lat, y = lng;
+        for (var i = 0, j = delhiBoundary.length - 1; i < delhiBoundary.length; j = i++) {
+            var xi = delhiBoundary[i][0], yi = delhiBoundary[i][1];
+            var xj = delhiBoundary[j][0], yj = delhiBoundary[j][1];
+            var intersect = ((yi > y) != (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi);
+            if (intersect) inside = !inside;
+        }
+        return inside;
+    }
+
+    // Function to fetch the region name based on latitude and longitude
+    function getRegionName(lat, lng) {
+        var url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`;
+
+        $.get(url, function (data) {
+            if (data && data.address) {
+                var region = data.address.suburb || data.address.neighborhood || data.address.city || "Unknown Region";
+                document.getElementById('region').innerText = region;
+            } else {
+                document.getElementById('region').innerText = "Region not found";
+            }
+        });
+    }
+
+    // Update the coordinates when the marker is dragged
+    marker.on('dragend', function () {
+        var lat = marker.getLatLng().lat;
+        var lng = marker.getLatLng().lng;
+
+        // Update latitude and longitude in the panel
+        document.getElementById('latitude').innerText = lat.toFixed(6);
+        document.getElementById('longitude').innerText = lng.toFixed(6);
+
+        // Fetch the region name based on the new coordinates
+        getRegionName(lat, lng);
+    });
+
+    // When the user clicks the button, send data to Flask
+    document.getElementById('sendData').addEventListener('click', function () {
+        var latitude = parseFloat(document.getElementById('latitude').innerText);
+        var longitude = parseFloat(document.getElementById('longitude').innerText);
+        var date = document.getElementById('date').value;
+
+        // Validate latitude and longitude
+        if (latitude === 'N/A' || longitude === 'N/A') {
+            alert('Please select a region on the map!');
+            return;
+        }
+
+        // Check if the selected region is within Delhi's boundary
+        if (!isWithinDelhiBounds(latitude, longitude)) {
+            // Show error message if outside Delhi
+            document.getElementById('errorMessage').style.display = 'block';
+            return;
+        } else {
+            document.getElementById('errorMessage').style.display = 'none';  // Hide error message
+        }
+
+        // Simulate predicted load, weather data, and holiday status
+        var predictedLoad = getPredictedLoad();
+        var weatherData = getWeatherData();
+        var holidayStatus = checkHoliday(date);
+
+        // Update the UI with prediction data
+        document.getElementById('predicted-load').innerText = predictedLoad + ' MWh';
+        document.getElementById('temperature').innerText = weatherData.temperature + ' °C';
+        document.getElementById('humidity').innerText = weatherData.humidity + ' %';
+        document.getElementById('holiday').innerText = holidayStatus;
+    });
+
+    // Function to simulate predicted load with minimal fluctuation
+    function getPredictedLoad() {
+        var baseLoad = 2200;  // Base predicted load
+        var fluctuation = 0.02; // 2% fluctuation
+        return (baseLoad * (1 + (Math.random() * 2 * fluctuation - fluctuation))).toFixed(2);
+    }
+
+    // Function to fetch weather data (temperature, humidity) for the selected region
+    function getWeatherData() {
+        var temperature = (28 + Math.random() * 2).toFixed(2);  // Random temperature between 28-30°C
+        var humidity = (60 + Math.random() * 10).toFixed(2);  // Random humidity between 60-70%
+        return { temperature: temperature, humidity: humidity };
+    }
+
+    // Function to check if the date is a holiday (simplified)
+    function checkHoliday(date) {
+        if (new Date(date).getDay() === 0) {  // Assume Sunday is a holiday
+            return "Yes";
+        }
+        return "No";
+    }
+</script>
+
+</body>
+</html>

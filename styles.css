@@ -1,0 +1,57 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    margin: 0;
+    padding: 0;
+}
+#map {
+    height: 400px; /* Adjust height as needed */
+    width: 100%;
+}
+
+
+header {
+    padding: 20px;
+    background-color: #5d00b3;
+    color: white;
+    text-align: center;
+}
+
+.map-container {
+    width: 100%;
+    height: 500px;
+    margin: 20px auto;
+}
+
+.input-panel {
+    padding: 20px;
+    background-color: #fff;
+    margin: 20px auto;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 60%;
+}
+
+.input-panel input {
+    padding: 10px;
+    margin: 10px;
+    width: 200px;
+}
+
+#sendData {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+}
+
+#prediction-output {
+    text-align: center;
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #fff;
+    margin: 0 auto;
+    width: 60%;
+}
